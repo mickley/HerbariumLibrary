@@ -113,7 +113,7 @@ function initDataTables(){
 	    columnDefs: [
 	    	{targets: 0, sTitle: "ID"},
 	    	{targets: 1, sTitle: "Owner"},
-	    	{targets: 2, sTitle: "Category"},
+	    	{targets: 2, sTitle: "Category", width: "130px"},
 	    	{targets: 3, sTitle: "Location"},
 	    	{targets: 4, sTitle: "Topic"},
 	    	{targets: 5, sTitle: "Title"},
@@ -289,19 +289,28 @@ function initDataTables(){
 
                 let column = this;
                 let title = column.header().textContent;
-                let items = column.data().filter((v,i,a)=>a.indexOf(v)==i);
+                let items = Array.from(column.data().filter((v,i,a)=>a.indexOf(v)==i));
                 let elem = ''
                 let baseStyle = 'width: calc(100% - 7px); margin-top: 5px; border-radius: 3px; border: 1px solid #888; padding: 2px 5px;';
-
 
                	// Disable search box for these columns
                 let noSearch = ['Edition', 'Volume'];
 
                 // Configure the html element to append to the header cell
-                if (noSearch.indexOf(title) < 0) {
+                // Dropdown for Category
+                if (title == 'Category') {
+
+                	elem = '<select style="width: calc(100%); margin-top: 5px; border-radius: 3px; border: 1px solid #888; padding: 1px 5px;">';
+                	elem += '<option value="<All>">All</option>';
+                	items.forEach((item) => {elem += '<option value="' + item + '">' + item + '</option>'});
+                	elem += '</select>';
+
+                // Everything else gets a text search input
+                } else if (noSearch.indexOf(title) < 0) {
 
                 	// Active search columns
                 	elem = '<input type="text" placeholder="All" style="' + baseStyle + '" />';
+
                 } else {
 
                 	// Searching disabled
@@ -309,13 +318,44 @@ function initDataTables(){
                 }
 
 				// Create input element and add event listener
-                $(elem)
-                    .appendTo($(column.header()))
+                $(elem).appendTo($(column.header()))
 
                     // Update search when things change
                     .on('keyup change clear', function () {
                         if (column.search() !== this.value) {
-                            column.search(this.value).draw();
+
+                        	// Special search case for year ranges, when a hyphen is present in the search
+                        	if(title == "Year" & this.value.includes("-")) {
+
+                        		// Get the two years in the range
+                        		let yrs = this.value.split('-'); 
+    
+    							// Check to see if both years are 4 digits (won't activate until 2nd year has 4 digits)
+                        		if (yrs[1].length == 4 & yrs[0].length == 4) {
+
+                        			// Search for a year range
+                        			column.search(function(data, row) {
+                        				if(data >= yrs[0] & data <= yrs[1]) {
+                        					return true;
+                        				} else {
+                        					return false;
+                        				}
+                        			}).draw();
+                        		}
+
+                        	} else {
+
+                        		// Allow for special value to reset and show everything (for dropdowns)
+                        		if(this.value == '<All>') {
+
+                        			// Empty search
+                        			column.search('').draw();
+                        		} else {
+
+                        			// Typical search
+                        			column.search(this.value).draw();
+                        		}
+                        	}
                         }
                     })
 
