@@ -3,12 +3,15 @@
 // Run on page load
 window.onload = function(e){ 
 
-	// If on Drupal, add the table tag for DataTables to hook onto
-	if(window.location.origin == "https://bpp.oregonstate.edu") {
+	// // If on Drupal, add the table tag for DataTables to hook onto
+	// if(window.location.origin == "https://bpp.oregonstate.edu") {
 
-		// Create table and add it to the appropriate div
-		$(".region-content").append('<table id="library"></table>');
-	}
+	// 	// Create table and add it to the appropriate div
+	// 	$(".region-content").append('<table id="library" class="stripe hover cell-border compact"></table>');
+	// }
+
+	// Add Table Styles
+	$('#library').addClass("stripe hover cell-border compact");
 
 	// Start DataTables
 	initDataTables();
@@ -19,11 +22,10 @@ window.onload = function(e){
 // This initializes and configures the DataTables instance
 function initDataTables(){
 
-	// Add Table Styles
-	$('#library').addClass("stripe hover cell-border compact");
-
-	// Override datatables selected CSS
-	$(":root").css({"--dt-row-selected": "176, 190, 217", "--dt-row-selected-text": "0, 0, 0"});
+	// Override some CSS styles: smaller buttons, change select color, center column headers
+	$('head').append('<style>.dt-button {padding: .25em 1em !important;} ' + 
+		':root {--dt-row-selected: 176, 190, 217; --dt-row-selected-text: 0, 0, 0;}' + 
+		'.dt-column-title {margin: 0 auto; display: table;}</style>');
 
 	// Initialize DataTable, with options
 	$('#library').DataTable({
@@ -47,7 +49,7 @@ function initDataTables(){
 	        		}
 
 	        		// Add an edit link
-	        		arr[16] = '<a href="' + arr[0] + '" onClick="editRow(' + arr[0] + ');">Edit</a>';
+	        		arr[16] = "<a href='#' onClick='editRow(" + JSON.stringify(arr) +  ");'>Edit</a>";
 	        		
 	        		// Return the modified array
 	        		return arr;
@@ -277,13 +279,6 @@ function initDataTables(){
 		// Run after the DataTable is constructed
 	    initComplete: function () {
 
-	    	// Edit some CSS styles
-	    	// Center column title
-	    	$('.dt-column-title').css({"margin": "0 auto", "display": "table"});
-
-	    	// Adjust button size
-	    	$('.dt-button').css({"padding": "3px 10px 3px 10px"});
-
 	    	// Interate over each column to modify column header
         	this.api().columns().every(function () {
 
@@ -377,27 +372,27 @@ function initDataTables(){
 	// document.head.appendChild(script);
 // Then run addDataTables()
 
-function addDataTables(){
+// function addDataTables(){
 
-	// Add DataTables JS (including jQuery)
-	let script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.src = 'https://herbarium.science.oregonstate.edu/library/DataTables/datatables.min.js';
-	document.head.appendChild(script);
+// 	// Add DataTables JS (including jQuery)
+// 	let script = document.createElement('script');
+// 	script.type = 'text/javascript';
+// 	script.src = 'https://herbarium.science.oregonstate.edu/library/DataTables/datatables.min.js';
+// 	document.head.appendChild(script);
 
-	// Run modifyDrupal() after a delay to ensure that our javascript has loaded. 
-	setTimeout(modifyDrupal, 1000);
-}
+// 	// Run modifyDrupal() after a delay to ensure that our javascript has loaded. 
+// 	setTimeout(modifyDrupal, 1000);
+// }
 
-function modifyDrupal() {
+// function modifyDrupal() {
 
-	// Add DataTables css (requires jQuery)
-	$('head').append('<link href="https://herbarium.science.oregonstate.edu/library/DataTables/datatables.min.css" rel="stylesheet" />');
+// 	// Add DataTables css (requires jQuery)
+// 	$('head').append('<link href="https://herbarium.science.oregonstate.edu/library/DataTables/datatables.min.css" rel="stylesheet" />');
 
-	// Create table and add it to the appropriate div
-	$(".region-content").append('<table id="library"></table>');
+// 	// Create table and add it to the appropriate div
+// 	$(".region-content").append('<table id="library" class="stripe hover cell-border compact"></table>');
 
-	// Initialize DataTables
-	initDataTables()
+// 	// Initialize DataTables
+// 	initDataTables()
 
-}
+// }
